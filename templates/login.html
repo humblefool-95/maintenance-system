@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login – Maintenance System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui,Arial;
+  background:#f1f3f6;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.card{
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 4px 15px rgba(0,0,0,.1);
+  width:320px;
+}
+
+h2{
+  text-align:center;
+  margin-bottom:15px;
+}
+
+input, select{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+
+button{
+  width:100%;
+  margin-top:15px;
+  padding:12px;
+  background:#0b5ed7;
+  color:white;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+}
+
+button.signup{
+  background:#198754;
+}
+
+small{
+  display:block;
+  text-align:center;
+  margin-top:10px;
+  color:#555;
+}
+</style>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// ===== SUPABASE CONFIG =====
+const supabaseUrl = "https://cyaxvuwkwptaxbkpwyid.supabase.co";
+const supabaseKey = "sb_publishable_wshxDs-Q_gUgYXxVjw7bwA_ycY3kndA";
+
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+// ===== LOGIN FUNCTION =====
+async function loginUser(){
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const selectedRole = document.getElementById("loginRole").value;
+
+  if(!email || !password){
+    alert("Please enter email and password");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    alert("❌ " + error.message);
+    return;
+  }
+
+  const user = data.user;
+
+  // ===== CHECK PROFILE =====
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("role")
+    .eq("user_id", user.id)
+    .single();
+
+  // ===== CREATE PROFILE IF NOT EXISTS =====
+  if(!profile){
+
+    const { error: insertError } = await supabaseClient
+      .from("profiles")
+      .insert([{
+        user_id: user.id,
+        email: user.email,
+        role: "user"
+      }]);
+
+    if(insertError){
+      alert("❌ Profile creation failed");
+      return;
+    }
+  }
+
+  // ===== FETCH PROFILE AGAIN =====
+  const { data: newProfile } = await supabaseClient
+    .from("profiles")
+    .select("role")
+    .eq("user_id", user.id)
+    .single();
+
+  // ===== ADMIN PROTECTION =====
+  if(selectedRole === "admin" && newProfile.role !== "admin"){
+    alert("❌ You are NOT authorized as Admin");
+    await supabaseClient.auth.signOut();
+    return;
+  }
+
+  // ===== SUCCESS LOGIN =====
+  window.location.href = "index.html";
+}
+
+// ===== SIGNUP FUNCTION =====
+async function signupUser(){
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  if(!email || !password){
+    alert("Please enter email and password");
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+
+  if(error){
+    alert("❌ " + error.message);
+    return;
+  }
+
+  alert("✅ Account created successfully. Now login.");
+}
+</script>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Maintenance Login</h2>
+
+<input type="email" id="email" placeholder="Email" required>
+
+<input type="password" id="password" placeholder="Password" required>
+
+<select id="loginRole">
+  <option value="user">Login as User</option>
+  <option value="admin">Login as Admin</option>
+</select>
+
+<button onclick="loginUser()">Login</button>
+
+<button class="signup" onclick="signupUser()">Create Account</button>
+
+<small>Powered by Supabase Cloud</small>
+
+</div>
+
+</body>
+</html>

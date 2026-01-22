@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Train Maintenance Entry</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui,Arial;
+  background:#f1f3f6;
+}
+
+header{
+  background:#0b5ed7;
+  color:#fff;
+  padding:12px;
+  text-align:center;
+}
+
+h1{margin:0;font-size:20px}
+
+.container{padding:10px}
+
+.card{
+  background:#fff;
+  padding:16px;
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+label{
+  display:block;
+  margin-top:12px;
+  font-weight:600;
+}
+
+select,input,textarea{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+textarea{min-height:70px}
+
+button{
+  width:100%;
+  margin-top:15px;
+  padding:12px;
+  background:#0b5ed7;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>TRAIN INFORMATION</h1>
+  <p>Maintenance Entry Page</p>
+</header>
+
+<div class="container">
+  <div class="card">
+
+<form id="maintenanceForm">
+
+<label>Train Set
+<select id="trainSet" required>
+<option value="">Select</option>
+<script>
+for(let i=1;i<=29;i++){
+document.write(`<option value="${i}">${i}</option>`);
+}
+</script>
+</select>
+</label>
+
+<label>Location
+<select id="location" required>
+<option value="">Select</option>
+<option>IBL-01OE</option><option>IBL-02OE</option><option>IBL-03OE</option>
+<option>WBL-01</option><option>WBL-02</option>
+<option>SBL-01OE</option><option>SBL-02OE</option>
+<option>HCL</option><option>PWL</option>
+</select>
+</label>
+
+<label>Date
+<input type="date" id="startDate" required>
+</label>
+
+<label>Start Time
+<input type="time" id="startTime" required>
+</label>
+
+<label>End Time
+<input type="time" id="expectedEndTime" required>
+</label>
+
+<label>Work Description
+<textarea id="workGoing" required></textarea>
+</label>
+
+<button type="submit">Save Entry</button>
+
+</form>
+
+</div>
+</div>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabaseUrl = "https://cyaxvuwkwptaxbkpwyid.supabase.co";
+const supabaseKey = "sb_publishable_wshxDs-Q_gUgYXxVjw7bwA_ycY3kndA";
+
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+document.getElementById("maintenanceForm").addEventListener("submit", async function(e){
+
+e.preventDefault();
+
+const data = {
+  train_set: trainSet.value,
+  location: location.value,
+  date: startDate.value,
+  start_time: startTime.value,
+  end_time: expectedEndTime.value,
+  work: workGoing.value
+};
+
+const { error } = await supabaseClient
+.from("train_maintenance")
+.insert([data]);
+
+if(error){
+ alert("❌ Error: " + error.message);
+}
+else{
+ alert("✅ Train data saved to cloud");
+ this.reset();
+}
+
+});
+</script>
+
+</body>
+</html>
