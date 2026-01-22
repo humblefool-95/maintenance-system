@@ -2,23 +2,22 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# ---------------- HOME / LOGIN ----------------
+# ---------------- LOGIN ----------------
 
 @app.route("/")
-def home():
+def login_page():
     return render_template("login.html")
 
 
 @app.route("/login", methods=["POST"])
-def login():
+def login_action():
     email = request.form.get("email")
     password = request.form.get("password")
 
-    # TEMP SIMPLE LOGIN (for testing)
     if email and password:
         return redirect(url_for("dashboard"))
     else:
-        return "Login Failed"
+        return "Login failed"
 
 
 # ---------------- DASHBOARD ----------------
@@ -28,7 +27,7 @@ def dashboard():
     return render_template("Index.html")
 
 
-# ---------------- MODULE PAGES ----------------
+# ---------------- MODULE ROUTES ----------------
 
 @app.route("/train")
 def train():
@@ -50,7 +49,12 @@ def records():
     return render_template("records.html")
 
 
-# ---------------- RUN LOCAL ----------------
+# ---------------- HEALTH CHECK ----------------
+
+@app.route("/health")
+def health():
+    return "OK"
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=10000)
