@@ -1,16 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Train Maintenance</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Train Maintenance Entry</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{font-family:Arial;background:#eef2f6;margin:0}
-header{background:#0b5ed7;color:white;padding:10px;text-align:center}
-.card{background:white;margin:12px;padding:15px;border-radius:12px}
-input,textarea{width:100%;padding:8px;margin-top:6px}
-button{width:100%;padding:12px;background:#198754;color:white;border:none}
+body{
+  margin:0;
+  font-family:system-ui,Arial;
+  background:#f1f3f6;
+}
+
+header{
+  background:#0b5ed7;
+  color:#fff;
+  padding:12px;
+  text-align:center;
+}
+
+h1{margin:0;font-size:20px}
+p{margin:4px 0 0;font-size:13px}
+
+.container{padding:10px}
+
+.card{
+  background:#fff;
+  padding:16px;
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+label{
+  display:block;
+  margin-top:12px;
+  font-weight:600;
+}
+
+select,input,textarea{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:15px;
+}
+
+textarea{min-height:70px}
+
+button{
+  width:100%;
+  margin-top:15px;
+  padding:12px;
+  background:#198754;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+}
 </style>
 </head>
 
@@ -18,52 +65,121 @@ button{width:100%;padding:12px;background:#198754;color:white;border:none}
 
 <!-- SUPABASE INIT -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
+
 <script>
 window.supabaseClient = supabase.createClient(
   "https://cyaxvuwkwptaxbkpwyid.supabase.co",
   "sb_publishable_wshxDs-Q_gUgYXxVjw7bwA_ycY3kndA"
 );
-console.log("Supabase loaded");
 </script>
 
 <header>
-<h3>Train Maintenance Entry</h3>
+  <h1>TRAIN INFORMATION</h1>
+  <p>Maintenance Entry Page</p>
 </header>
 
+<div class="container">
 <div class="card">
 
-<input id="train_set" placeholder="Train Set">
-<input id="location" placeholder="Location">
-<input type="date" id="date">
-<input type="time" id="start_time">
-<input type="time" id="end_time">
-<textarea id="work" placeholder="Work Description"></textarea>
+<!-- Train Set -->
+<label>Train Set</label>
+<select id="trainSet" required>
+<option value="">Select Train Set</option>
+</select>
 
-<button onclick="saveTrain()">Save</button>
+<!-- Location -->
+<label>Location</label>
+<select id="location" required>
+<option value="">Select Location</option>
+<option>IBL-01OE</option>
+<option>IBL-02OE</option>
+<option>IBL-03OE</option>
+<option>IBL-01DE</option>
+<option>IBL-02DE</option>
+<option>IBL-03DE</option>
+<option>WBL-01</option>
+<option>WBL-02</option>
+<option>WBL-03</option>
+<option>SBL-01OE</option>
+<option>SBL-02OE</option>
+<option>SBL-03OE</option>
+<option>SBL-04OE</option>
+<option>SBL-05OE</option>
+<option>SBL-06OE</option>
+<option>SBL-07OE</option>
+<option>SBL-08OE</option>
+<option>SBL-09OE</option>
+<option>SBL-01DE</option>
+<option>SBL-02DE</option>
+<option>SBL-03DE</option>
+<option>SBL-04DE</option>
+<option>SBL-05DE</option>
+<option>SBL-06DE</option>
+<option>SBL-07DE</option>
+<option>SBL-08DE</option>
+<option>SBL-09DE</option>
+<option>HCL</option>
+<option>PWL</option>
+<option>Test Track</option>
+</select>
 
+<!-- Date -->
+<label>Date</label>
+<input type="date" id="date" required>
+
+<!-- Time -->
+<label>Start Time</label>
+<input type="time" id="startTime" required>
+
+<label>Expected End Time</label>
+<input type="time" id="endTime" required>
+
+<!-- Work -->
+<label>Work On Going</label>
+<textarea id="work" required></textarea>
+
+<button onclick="saveMaintenance()">Save Entry</button>
+
+</div>
 </div>
 
 <script>
-async function saveTrain(){
 
-const payload={
-  train_set:train_set.value,
-  location:location.value,
-  date:date.value,
-  start_time:start_time.value,
-  end_time:end_time.value,
-  work:work.value
+// Auto generate Train Set dropdown 1-29
+const trainDropdown = document.getElementById("trainSet");
+
+for(let i=1;i<=29;i++){
+  const opt = document.createElement("option");
+  opt.value = i;
+  opt.textContent = i;
+  trainDropdown.appendChild(opt);
 }
 
-const {error}=await window.supabaseClient
+
+// SAVE TO SUPABASE
+async function saveMaintenance(){
+
+const payload = {
+  train_set: trainSet.value,
+  location: location.value,
+  date: date.value,
+  start_time: startTime.value,
+  end_time: endTime.value,
+  work: work.value
+};
+
+const { error } = await window.supabaseClient
 .from("train_maintenance")
-.insert([payload])
+.insert([payload]);
 
 if(error){
- alert(error.message)
-}else{
- alert("Saved Successfully")
- document.querySelectorAll("input,textarea").forEach(e=>e.value="")
+  alert("❌ " + error.message);
+}
+else{
+  alert("✅ Data Saved Successfully");
+  document.querySelectorAll("input, textarea").forEach(e => e.value = "");
+  trainSet.selectedIndex = 0;
+  location.selectedIndex = 0;
 }
 
 }
