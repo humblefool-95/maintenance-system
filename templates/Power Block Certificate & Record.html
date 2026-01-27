@@ -1,187 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Power Block Certificate</title>
+<title>Power Block</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
+
+<script>
+window.supabaseClient = supabase.createClient(
+  "https://cyaxvuwkwptaxbkpwyid.supabase.co",
+  "sb_publishable_wshxDs-Q_gUgYXxVjw7bwA_ycY3kndA"
+);
+</script>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #eef2f6;
-}
-
-header {
-  background: #0b5ed7;
-  color: #fff;
-  text-align: center;
-  padding: 10px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 20px;
-}
-
-header p {
-  margin-top: 3px;
-  font-size: 13px;
-}
-
-.container {
-  padding: 12px;
-}
-
-.card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-}
-
-.card h3 {
-  margin-top: 0;
-  font-size: 16px;
-  color: #0b5ed7;
-}
-
-label {
-  display: block;
-  margin-top: 10px;
-  font-weight: 600;
-}
-
-input, textarea {
-  width: 100%;
-  padding: 9px;
-  margin-top: 5px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-textarea {
-  min-height: 60px;
-}
-
-.row {
-  display: flex;
-  gap: 10px;
-}
-
-.row div {
-  flex: 1;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  background: #198754;
-  color: #fff;
-  font-size: 16px;
-  border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.9;
-}
+body{font-family:Arial;background:#eef2f6;margin:0}
+header{background:#0b5ed7;color:white;padding:10px;text-align:center}
+.card{background:white;margin:12px;padding:15px;border-radius:12px}
+input,textarea{width:100%;padding:8px;margin-top:6px}
+button{width:100%;padding:12px;background:#198754;color:white;border:none}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>Power Block Certificate</h1>
-  <p>UPMRC – Electrical Safety Record</p>
+<h3>Power Block Certificate</h3>
 </header>
-
-<div class="container">
 
 <div class="card">
 
-<h3>Power Block Request</h3>
+<input id="block_no" placeholder="Block No">
+<input id="location" placeholder="Location">
+<input type="date" id="date">
+<textarea id="purpose" placeholder="Purpose"></textarea>
 
-<label>Applicant Name</label>
-<input type="text" id="applicant">
-
-<label>Request Power Block From – To</label>
-<div class="row">
-  <div>
-    <input type="text" placeholder="From Location" id="from_loc">
-  </div>
-  <div>
-    <input type="text" placeholder="To Location" id="to_loc">
-  </div>
-</div>
-
-<label>Reason for Power Block</label>
-<textarea id="reason"></textarea>
-
-<label>Date & Time</label>
-<input type="datetime-local" id="req_datetime">
-
-<button id="saveBtn">Save Power Block</button>
+<button onclick="savePower()">Save Power Block</button>
 
 </div>
-</div>
-
-<!-- Supabase CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+async function savePower(){
 
-const supabaseUrl = "https://cyaxvuwkwptaxbkpwyid.supabase.co";
-const supabaseKey = "sb_publishable_wshxDs-Q_gUgYXxVjw7bwA_ycY3kndA";
+const payload={
+ block_no:block_no.value,
+ location:location.value,
+ date:date.value,
+ purpose:purpose.value
+}
 
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+const {error}=await window.supabaseClient
+.from("power_blocks")
+.insert([payload])
 
-// SAVE POWER BLOCK DATA
-document.getElementById("saveBtn").addEventListener("click", async function(){
+if(error){
+ alert(error.message)
+}else{
+ alert("Power Block Saved")
+ document.querySelectorAll("input,textarea").forEach(e=>e.value="")
+}
 
-  const applicant = document.getElementById("applicant").value;
-  const fromLoc = document.getElementById("from_loc").value;
-  const toLoc = document.getElementById("to_loc").value;
-  const reason = document.getElementById("reason").value;
-  const dateTime = document.getElementById("req_datetime").value;
-
-  if(!fromLoc || !toLoc || !dateTime){
-    alert("Please fill required fields");
-    return;
-  }
-
-  const payload = {
-    block_no: "PB-" + Date.now(),
-    location: fromLoc + " → " + toLoc,
-    date: dateTime,
-    start_time: "",
-    end_time: "",
-    purpose: reason
-  };
-
-  const { error } = await supabaseClient
-    .from("power_blocks")
-    .insert([payload]);
-
-  if(error){
-    alert("❌ Error saving record");
-    console.error(error);
-  }
-  else{
-    alert("✅ Power Block saved successfully");
-
-    document.getElementById("applicant").value = "";
-    document.getElementById("from_loc").value = "";
-    document.getElementById("to_loc").value = "";
-    document.getElementById("reason").value = "";
-    document.getElementById("req_datetime").value = "";
-  }
-
-});
-
+}
 </script>
 
 </body>
