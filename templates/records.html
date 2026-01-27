@@ -140,23 +140,12 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 <script>
 
-// ================= INIT AFTER LOGIN =================
+// ================= LOAD DATA =================
 
-async function initRecords(){
+loadTrainData();
+loadJobCards();
+loadPowerBlocks();
 
-  const { data: authData } = await supabaseClient.auth.getUser();
-
-  if(!authData.user){
-    window.location.href = "login.html";
-    return;
-  }
-
-  loadTrainData();
-  loadJobCards();
-  loadPowerBlocks();
-}
-
-initRecords();
 
 // ================= TRAIN DATA =================
 
@@ -168,7 +157,7 @@ async function loadTrainData(){
     .order("id", { ascending:false });
 
   if(error){
-    alert("Train data error: " + error.message);
+    console.error(error);
     return;
   }
 
@@ -194,6 +183,7 @@ async function loadTrainData(){
   });
 }
 
+
 // ================= JOB CARD DATA =================
 
 async function loadJobCards(){
@@ -204,7 +194,7 @@ async function loadJobCards(){
     .order("id", { ascending:false });
 
   if(error){
-    alert("Job card error: " + error.message);
+    console.error(error);
     return;
   }
 
@@ -232,6 +222,7 @@ async function loadJobCards(){
   });
 }
 
+
 // ================= POWER BLOCK DATA =================
 
 async function loadPowerBlocks(){
@@ -242,7 +233,7 @@ async function loadPowerBlocks(){
     .order("id", { ascending:false });
 
   if(error){
-    alert("Power block error: " + error.message);
+    console.error(error);
     return;
   }
 
