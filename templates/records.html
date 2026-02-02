@@ -55,7 +55,6 @@ th{
 
 <body>
 
-<!-- SUPABASE INIT -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
 
 <script>
@@ -104,23 +103,23 @@ async function loadTrainRecords(){
 const { data, error } = await window.supabaseClient
   .from("train_maintenance")
   .select("train_set, location, date, start_time, end_time, work")
-  .order("id", { ascending: false });
+  .order("id", { ascending:false });
 
 if(error){
+  alert("Error loading records");
   console.error(error);
-  alert("Error loading maintenance records");
   return;
 }
 
 const tableBody = document.getElementById("body");
 tableBody.innerHTML = "";
 
-data.forEach((row, index) => {
+data.forEach((row,index)=>{
 
   const tr = document.createElement("tr");
 
   tr.innerHTML = `
-    <td>${index + 1}</td>
+    <td>${index+1}</td>
     <td>${row.train_set || ""}</td>
     <td>${row.location || ""}</td>
     <td>${row.date || ""}</td>
