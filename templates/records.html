@@ -55,6 +55,7 @@ th{
 
 <body>
 
+<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
 
 <script>
@@ -87,7 +88,7 @@ window.supabaseClient = supabase.createClient(
 </tr>
 </thead>
 
-<tbody id="body"></tbody>
+<tbody id="recordsBody"></tbody>
 
 </table>
 
@@ -107,13 +108,13 @@ const { data, error } = await window.supabaseClient
   .order("id", { ascending:false });
 
 if(error){
-  alert("Error loading records");
+  alert("Error loading maintenance records");
   console.error(error);
   return;
 }
 
-const tableBody = document.getElementById("body");
-tableBody.innerHTML = "";
+const table = document.getElementById("recordsBody");
+table.innerHTML = "";
 
 data.forEach((row,index)=>{
 
@@ -129,7 +130,7 @@ data.forEach((row,index)=>{
     <td>${row.work || ""}</td>
   `;
 
-  tableBody.appendChild(tr);
+  table.appendChild(tr);
 
 });
 
