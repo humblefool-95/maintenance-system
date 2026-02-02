@@ -55,6 +55,7 @@ th{
 
 <body>
 
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
 
 <script>
@@ -92,6 +93,7 @@ window.supabaseClient = supabase.createClient(
 </table>
 
 </div>
+
 </div>
 
 <script>
@@ -106,8 +108,8 @@ const { data, error } = await window.supabaseClient
   .order("id", { ascending:false });
 
 if(error){
-  alert("Error loading records");
   console.error(error);
+  alert("Error loading records");
   return;
 }
 
@@ -119,7 +121,7 @@ data.forEach((row,index)=>{
   const tr = document.createElement("tr");
 
   tr.innerHTML = `
-    <td>${index+1}</td>
+    <td>${index + 1}</td>
     <td>${row.train_set || ""}</td>
     <td>${row.location || ""}</td>
     <td>${row.date || ""}</td>
